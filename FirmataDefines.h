@@ -133,6 +133,11 @@
 #endif
 #define SHIFT_DATA              firmata::SHIFT_DATA // a bitstream to/from a shift register
 
+#ifdef PULSE_REQUEST
+#undef PULSE_REQUEST
+#endif
+#define PULSE_REQUEST           firmata::PULSE_REQUEST // send an PulseIn/PulseOut request
+
 #ifdef I2C_REQUEST
 #undef I2C_REQUEST
 #endif
