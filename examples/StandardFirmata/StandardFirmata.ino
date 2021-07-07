@@ -486,6 +486,69 @@ void sysexCallback(byte command, byte argc, byte *argv)
   unsigned int delayTime;
 
   switch (command) {
+    case PULSE_REQUEST:
+      int triggerPin = argv[0]
+      int echoPin = argv[1]
+      mode = argv[2]
+      
+      byte pulseDurationData[4] = {
+        (argv[3] & 0x7F) | ((argv[4] & 0x7F) << 7)
+        , (argv[5] & 0x7F) | ((argv[6] & 0x7F) << 7)
+        , (argv[7] & 0x7F) | ((argv[8] & 0x7F) << 7)
+        , (argv[9] & 0x7F) | ((argv[10] & 0x7F) << 7)
+      };
+
+      unsigned long pulseDuration = (
+        ((unsigned long)pulseDurationData[0] << 24)
+        + ((unsigned long)pulseDurationData[1] << 16)
+        + ((unsigned long)pulseDurationData[2] << 8)
+        + ((unsigned long)pulseDurationData[3])
+      );
+
+      byte echoTimeoutData[4] = {
+        (argv[11] & 0x7F) | ((argv[12] & 0x7F) << 7)
+        , (argv[13] & 0x7F) | ((argv[14] & 0x7F) << 7)
+        , (argv[15] & 0x7F) | ((argv[16] & 0x7F) << 7)
+        , (argv[17] & 0x7F) | ((argv[18] & 0x7F) << 7)
+      };
+
+      unsigned long echoTimeout = (
+        ((unsigned long)echoTimeoutData[0] << 24)
+        + ((unsigned long)echoTimeoutData[1] << 16)
+        + ((unsigned long)echoTimeoutData[2] << 8)
+        + ((unsigned long)echoTimeoutData[3])
+      );
+
+      pinMode(triggerPin, OUTPUT);
+
+      if(mode == HIGH){
+        digitalWrite(triggerPin, LOW);
+        delayMicroseconds(2);
+        digitalWrite(triggerPin, HIGH);
+        delayMicroseconds(pulseDuration);
+        digitalWrite(triggerPin, LOW);
+      } else {
+        digitalWrite(triggerPin, HIGH);
+        delayMicroseconds(2);
+        digitalWrite(triggerPin, LOW);
+        delayMicroseconds(pulseDuration);
+        digitalWrite(triggerPin, HIGH);
+      }
+
+      pinMode(echoPin, INPUT);
+
+      unsigned long duration = pulseIn(echoPin, mode, echoTimeout);
+
+      byte responseData[5] = {
+        echoPin
+        , (((unsigned long)duration >> 24) & 0xFF)
+        , (((unsigned long)duration >> 16) & 0xFF)
+        , (((unsigned long)duration >> 8) & 0xFF)
+        , (((unsigned long)duration & 0xFF))
+      };
+
+      Firmata.sendSysex(PULSE_REQUEST, 5, responseData);
+      break;
     case I2C_REQUEST:
       mode = argv[1] & I2C_READ_WRITE_MODE_MASK;
       if (argv[1] & I2C_10BIT_ADDRESS_MODE_MASK) {

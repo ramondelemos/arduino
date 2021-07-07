@@ -58,6 +58,7 @@ static const int SERVO_CONFIG =            0x70; // set max angle, minPulse, max
 static const int STRING_DATA =             0x71; // a string message with 14-bits per char
 static const int STEPPER_DATA =            0x72; // control a stepper motor
 static const int ONEWIRE_DATA =            0x73; // send an OneWire read/write/reset/select/skip/search request
+static const int PULSE_REQUEST =           0x74; // send an PulseIn/PulseOut request
 static const int SHIFT_DATA =              0x75; // a bitstream to/from a shift register
 static const int I2C_REQUEST =             0x76; // send an I2C read/write request
 static const int I2C_REPLY =               0x77; // a reply to an I2C read request
